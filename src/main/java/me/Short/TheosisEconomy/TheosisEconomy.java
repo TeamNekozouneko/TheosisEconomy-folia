@@ -3,6 +3,7 @@ package me.Short.TheosisEconomy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import litebans.api.Database;
 import me.Short.TheosisEconomy.Commands.BalanceCommand;
 import me.Short.TheosisEconomy.Commands.BalancetopCommand;
@@ -12,6 +13,8 @@ import me.Short.TheosisEconomy.Commands.PaytoggleCommand;
 import me.Short.TheosisEconomy.Events.PreBaltopSortEvent;
 import me.Short.TheosisEconomy.Listeners.PlayerJoinListener;
 import me.Short.TheosisEconomy.Listeners.ServerLoadListener;
+import me.Short.TheosisEconomy.Managers.BaltopManager;
+import me.Short.TheosisEconomy.Tasks.UpdateBaltopTask;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -56,6 +59,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -63,6 +67,8 @@ import java.util.logging.Logger;
 
 public class TheosisEconomy extends JavaPlugin
 {
+    // Static Instance
+    private static JavaPlugin instance;
 
     // Map containing snapshots of player accounts to be saved to respective JSON files on a schedule
     private Map<UUID, PlayerAccountSnapshot> dirtyPlayerAccountSnapshots;
@@ -83,22 +89,19 @@ public class TheosisEconomy extends JavaPlugin
     private net.milkbowl.vault.economy.Economy economy;
 
     // Instance of the Vault Permissions API
-    private Permission permissions;
+    private static Permission permissions;
 
     // Cache of all player UUIDs (who have joined before) - this is so that offline players can easily be retrieved from their usernames
     private Map<String, UUID> playerCache;
 
     // Cache of all player accounts
-    private Map<UUID, PlayerAccount> playerAccounts;
+    private static Map<UUID, PlayerAccount> playerAccounts;
 
-    // Baltop
-    private Map<String, BigDecimal> baltop;
-
-    // Combined total of all players' balances - updated in "updateBaltop"
-    private BigDecimal combinedTotalBalance;
+    // Baltop Managers
+    private static BaltopManager baltopManager;
 
     // ID for the baltop update task, so it can be cancelled in the event of a reload
-    private int updateBaltopTaskId;
+    private UpdateBaltopTask updateBaltopTask;
 
     // Instance of the MiniMessage API
     private MiniMessage miniMessage;
@@ -110,17 +113,12 @@ public class TheosisEconomy extends JavaPlugin
     private LegacyComponentSerializer legacyComponentSerializer;
 
     // Whether LiteBans is installed - for checking in the "updateBaltop" method
-    private boolean liteBansInstalled;
-
-    // Config options that may need to be retrieved in the "updateBaltop" method later
-    private boolean baltopConsiderExcludePermission;
-    private boolean baltopExcludeBannedPlayers;
-    private BigDecimal baltopMinBalance;
+    private static boolean liteBansInstalled;
 
     // Is running on Folia?
-    private boolean isFolia = isClassExists("io.papermc.paper.threadedregions.RegionizedServer") || isClassExists("io.papermc.paper.threadedregions.RegionizedServerInitEvent");;
+    private static boolean isFolia = isClassExists("io.papermc.paper.threadedregions.RegionizedServer") || isClassExists("io.papermc.paper.threadedregions.RegionizedServerInitEvent");
 
-    private boolean isClassExists(String clazz){
+    private static boolean isClassExists(String clazz){
         try{
             Class.forName(clazz);
             return true;
@@ -132,6 +130,8 @@ public class TheosisEconomy extends JavaPlugin
     @Override
     public void onEnable()
     {
+        instance = this;
+
         // Set up config.yml
         saveDefaultConfig();
 
@@ -166,11 +166,7 @@ public class TheosisEconomy extends JavaPlugin
         // Set initial "playerCache" value to an empty case-insensitive map
         playerCache = new CaseInsensitiveMap<>();
 
-        // Set initial "baltop" value to an empty linked hashmap
-        baltop = new LinkedHashMap<>();
-
-        // Set initial "combinedTotalBalance" to 0
-        combinedTotalBalance = BigDecimal.ZERO;
+        baltopManager = new BaltopManager();
 
         // Get instance of the MiniMessage API
         miniMessage = MiniMessage.miniMessage();
@@ -180,11 +176,6 @@ public class TheosisEconomy extends JavaPlugin
 
         // Get instance of the BungeeComponentSerializer API - the additional options make it so that hover events work on Minecraft versions prior to 1.16
         bungeeComponentSerializer = BungeeComponentSerializer.of(GsonComponentSerializer.builder().editOptions(options -> options.value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.BOTH)).build(), legacyComponentSerializer);
-
-        // Get config options from config.yml here, so they don't need to be gotten in the async "updateBaltop" method later
-        baltopConsiderExcludePermission = getConfig().getBoolean("settings.baltop.consider-exclude-permission");
-        baltopExcludeBannedPlayers = getConfig().getBoolean("settings.baltop.exclude-banned-players");
-        baltopMinBalance = new BigDecimal(getConfig().getString("settings.baltop.min-balance"));
 
         // Register events
         PluginManager pluginManager = getServer().getPluginManager();
@@ -335,24 +326,8 @@ public class TheosisEconomy extends JavaPlugin
     public void scheduleBaltopUpdateTask()
     {
         // Call "updateBaltop" on a schedule (frequency defined in config.yml) and set "baltop" and "combinedTotalBalance" to its results
-        updateBaltopTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () ->
-        {
-            // Create PreBaltopSortEvent instance with an initial empty HashSet of excluded players' UUIDs
-            PreBaltopSortEvent preBaltopSortEvent = new PreBaltopSortEvent(new HashSet<>());
-
-            // Call the event
-            Bukkit.getServer().getPluginManager().callEvent(preBaltopSortEvent);
-
-            // Call "updateBaltop", passing in the HashSet of excluded players' UUIDs, if the event was NOT cancelled
-            if (!preBaltopSortEvent.isCancelled())
-            {
-                updateBaltop(preBaltopSortEvent.getExcludedPlayers()).thenAccept(pair ->
-                {
-                    setBaltop(pair.getLeft());
-                    setCombinedTotalBalance(pair.getRight());
-                });
-            }
-        }, 0L, getConfig().getLong("settings.baltop.update-task-frequency"));
+        updateBaltopTask = new UpdateBaltopTask();
+        updateBaltopTask.runTaskTimer(this, 0L, getConfig().getLong("settings.baltop.update-task-frequency"));
     }
 
     // Method to repeatedly call `saveDirtyPlayerAccounts()` async
@@ -391,43 +366,6 @@ public class TheosisEconomy extends JavaPlugin
                 dirtyPlayerAccountSnapshots.remove(entry.getKey());
             }
         }
-    }
-
-    // Method to update baltop async
-    public CompletableFuture<MutablePair<Map<String, BigDecimal>, BigDecimal>> updateBaltop(Set<UUID> excludedPlayers)
-    {
-        return CompletableFuture.supplyAsync(() ->
-        {
-            Map<String, BigDecimal> unsortedBaltop = new HashMap<>();
-            BigDecimal total = BigDecimal.ZERO;
-
-            // Get player names and their balances in no particular order, excluding banned players if config.yml says to not include them - the "Bukkit.getOfflinePlayer(uuid).isBanned()" is the only thing here that might not be safe to run async, but no issues so far in testing
-            for (UUID uuid : playerAccounts.keySet())
-            {
-                OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-
-                if (!excludedPlayers.contains(uuid) && !(baltopConsiderExcludePermission && permissions.playerHas(null, player, "theosiseconomy.balancetop.exclude")) && (!baltopExcludeBannedPlayers || !((liteBansInstalled && Database.get().isPlayerBanned(uuid, null)) || player.isBanned())))
-                {
-                    PlayerAccount account = playerAccounts.get(uuid);
-                    BigDecimal balance = account.getBalance();
-
-                    total = total.add(balance);
-
-                    if (balance.compareTo(baltopMinBalance) >= 0)
-                    {
-                        unsortedBaltop.put(account.getLastKnownUsername(), balance);
-                    }
-                }
-            }
-
-            // Create and return sorted version of "unsortedBaltop"
-            LinkedHashMap<String, BigDecimal> sortedBaltop = new LinkedHashMap<>();
-            unsortedBaltop.entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                    .forEach(entry -> sortedBaltop.put(entry.getKey(), entry.getValue()));
-
-            return new MutablePair<>(sortedBaltop, total);
-        });
     }
 
     // Method to send a MiniMessage-formatted string as BaseComponents to a CommandSender, with no tag resolvers
@@ -500,9 +438,7 @@ public class TheosisEconomy extends JavaPlugin
         reloadConfig();
 
         // Re-get values from config that were gotten in "onEnable"
-        baltopConsiderExcludePermission = getConfig().getBoolean("settings.baltop.consider-exclude-permission");
-        baltopExcludeBannedPlayers = getConfig().getBoolean("settings.baltop.exclude-banned-players");
-        baltopMinBalance = new BigDecimal(getConfig().getString("settings.baltop.min-balance"));
+        baltopManager.reload();
 
         // Set whether to send logs to console
         Logger logger = getLogger();
@@ -565,7 +501,7 @@ public class TheosisEconomy extends JavaPlugin
         playerAccounts = cachePlayerAccounts();
 
         // Cancel the current repeating baltop update task
-        scheduler.cancelTask(updateBaltopTaskId);
+        updateBaltopTask.safetyTaskCancel();
 
         // Re-schedule repeating baltop update task
         scheduleBaltopUpdateTask();
@@ -583,6 +519,8 @@ public class TheosisEconomy extends JavaPlugin
     }
 
     // ----- Getters -----
+
+    public static JavaPlugin getInstance() { return instance; }
 
     // Getter for "dirtyPlayerAccountSnapshots"
     public Map<UUID, PlayerAccountSnapshot> getDirtyPlayerAccountSnapshots()
@@ -603,21 +541,9 @@ public class TheosisEconomy extends JavaPlugin
     }
 
     // Getter for "playerAccounts"
-    public Map<UUID, PlayerAccount> getPlayerAccounts()
+    public static Map<UUID, PlayerAccount> getPlayerAccounts()
     {
         return playerAccounts;
-    }
-
-    // Getter for "baltop"
-    public Map<String, BigDecimal> getBaltop()
-    {
-        return baltop;
-    }
-
-    // Getter for "combinedTotalBalance"
-    public BigDecimal getCombinedTotalBalance()
-    {
-        return combinedTotalBalance;
     }
 
     // Getter for "miniMessage"
@@ -639,20 +565,23 @@ public class TheosisEconomy extends JavaPlugin
     }
 
     // Getter for "isFolia"
-    public Boolean isFolia() { return isFolia; }
-
-    // ----- Setters -----
-
-    // Setter for "baltop"
-    public void setBaltop(Map<String, BigDecimal> baltop)
-    {
-        this.baltop = baltop;
+    public static Boolean isFolia() {
+        return isFolia;
     }
 
-    // Setter for "combinedTotalBalance"
-    public void setCombinedTotalBalance(BigDecimal combinedTotalBalance)
-    {
-        this.combinedTotalBalance = combinedTotalBalance;
+    // Getter for "baltopManager"
+    public static BaltopManager getBaltopManager() {
+        return baltopManager;
+    }
+
+    // Getter for "permissions"
+    public static Permission getPermission() {
+        return permissions;
+    }
+
+    // Getter for "liteBansInstalled"
+    public static Boolean isLiteBansInstalled(){
+        return liteBansInstalled;
     }
 
 }
