@@ -41,12 +41,12 @@ public class PlayerJoinListener implements Listener
 
         // Update the player's last known username in their account, or create an account for the player if they don't already have one
         Economy economy = instance.getEconomy();
-        Map<UUID, PlayerAccount> playerAccounts = instance.getPlayerAccounts();
+        Map<UUID, PlayerAccount> playerAccounts = TheosisEconomy.getPlayerAccounts();
         if (economy.hasAccount(player)) // If the player already has an account...
         {
             if (!playerAccounts.get(uuid).getLastKnownUsername().equals(name))
             {
-                PlayerAccount account = instance.getPlayerAccounts().get(uuid);
+                PlayerAccount account = TheosisEconomy.getPlayerAccounts().get(uuid);
 
                 // Update the player's last known username
                 account.setLastKnownUsername(name);

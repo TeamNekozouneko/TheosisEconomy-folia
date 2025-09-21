@@ -88,7 +88,7 @@ public class EconomyCommand implements TabExecutor
                                             if (amount.compareTo(new BigDecimal(config.getString("settings.currency.max-balance"))) <= 0)
                                             {
                                                 UUID uuid = target.getUniqueId();
-                                                PlayerAccount account = instance.getPlayerAccounts().get(uuid);
+                                                PlayerAccount account = TheosisEconomy.getPlayerAccounts().get(uuid);
 
                                                 // Set the player's balancee
                                                 account.setBalance(amount);
@@ -423,7 +423,7 @@ public class EconomyCommand implements TabExecutor
                                         if (defaultBalance.compareTo(new BigDecimal(config.getString("settings.currency.max-balance"))) <= 0)
                                         {
                                             UUID uuid = target.getUniqueId();
-                                            PlayerAccount account = instance.getPlayerAccounts().get(uuid);
+                                            PlayerAccount account = TheosisEconomy.getPlayerAccounts().get(uuid);
 
                                             // Set the player's balance
                                             account.setBalance(defaultBalance);

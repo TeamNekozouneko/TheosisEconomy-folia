@@ -31,7 +31,7 @@ public class PaytoggleCommand implements CommandExecutor
             if (instance.getEconomy().hasAccount((player)))
             {
                 UUID uuid = player.getUniqueId();
-                PlayerAccount account = instance.getPlayerAccounts().get(uuid);
+                PlayerAccount account = TheosisEconomy.getPlayerAccounts().get(uuid);
 
                 if (account.getAcceptingPayments())
                 {

@@ -93,7 +93,7 @@ public class Economy implements net.milkbowl.vault.economy.Economy
     @Override
     public boolean hasAccount(OfflinePlayer player)
     {
-        return instance.getPlayerAccounts().containsKey(player.getUniqueId());
+        return TheosisEconomy.getPlayerAccounts().containsKey(player.getUniqueId());
     }
 
     @Override
@@ -105,7 +105,7 @@ public class Economy implements net.milkbowl.vault.economy.Economy
     @Override
     public double getBalance(OfflinePlayer player)
     {
-        return instance.getPlayerAccounts().get(player.getUniqueId()).getBalance().doubleValue();
+        return TheosisEconomy.getPlayerAccounts().get(player.getUniqueId()).getBalance().doubleValue();
     }
 
     @Override
@@ -117,7 +117,7 @@ public class Economy implements net.milkbowl.vault.economy.Economy
     @Override
     public boolean has(OfflinePlayer player, double amount)
     {
-        return instance.getPlayerAccounts().get(player.getUniqueId()).getBalance().compareTo(BigDecimal.valueOf(amount)) >= 0;
+        return TheosisEconomy.getPlayerAccounts().get(player.getUniqueId()).getBalance().compareTo(BigDecimal.valueOf(amount)) >= 0;
     }
 
     @Override
@@ -131,7 +131,7 @@ public class Economy implements net.milkbowl.vault.economy.Economy
     {
         UUID uuid = player.getUniqueId();
 
-        BigDecimal currentBalance = instance.getPlayerAccounts().get(uuid).getBalance();
+        BigDecimal currentBalance = TheosisEconomy.getPlayerAccounts().get(uuid).getBalance();
         BigDecimal bdAmount = instance.round(BigDecimal.valueOf(amount)).stripTrailingZeros();
         double bdAmountDoubleValue = bdAmount.doubleValue();
 
@@ -141,7 +141,7 @@ public class Economy implements net.milkbowl.vault.economy.Economy
             {
                 if (has(player, bdAmountDoubleValue))
                 {
-                    PlayerAccount account = instance.getPlayerAccounts().get(uuid);
+                    PlayerAccount account = TheosisEconomy.getPlayerAccounts().get(uuid);
 
                     BigDecimal resultingBalance = currentBalance.subtract(bdAmount);
 
@@ -217,7 +217,7 @@ public class Economy implements net.milkbowl.vault.economy.Economy
     {
         UUID uuid = player.getUniqueId();
 
-        BigDecimal currentBalance = instance.getPlayerAccounts().get(uuid).getBalance();
+        BigDecimal currentBalance = TheosisEconomy.getPlayerAccounts().get(uuid).getBalance();
         BigDecimal bdAmount = instance.round(BigDecimal.valueOf(amount)).stripTrailingZeros();
         double bdAmountDoubleValue = bdAmount.doubleValue();
 
@@ -231,7 +231,7 @@ public class Economy implements net.milkbowl.vault.economy.Economy
 
                 if (resultingBalance.compareTo(new BigDecimal(config.getString("settings.currency.max-balance"))) <= 0) // If "resultingBalance" is less than or equal to the max balance...
                 {
-                    PlayerAccount account = instance.getPlayerAccounts().get(uuid);
+                    PlayerAccount account = TheosisEconomy.getPlayerAccounts().get(uuid);
 
                     // Update the player's balance
                     account.setBalance(resultingBalance);

@@ -26,7 +26,7 @@ tasks {
 repositories {
     mavenCentral()
 
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
     maven("https://jitpack.io")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
@@ -45,7 +45,7 @@ dependencies {
 
     implementation("com.google.code.gson:gson:2.13.2")
 
-    compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
+    compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
     compileOnly("com.gitlab.ruany:LiteBansAPI:0.6.1")
     compileOnly("me.clip:placeholderapi:2.11.6")
