@@ -117,6 +117,18 @@ public class TheosisEconomy extends JavaPlugin
     private boolean baltopExcludeBannedPlayers;
     private BigDecimal baltopMinBalance;
 
+    // Is running on Folia?
+    private boolean isFolia = isClassExists("io.papermc.paper.threadedregions.RegionizedServer") || isClassExists("io.papermc.paper.threadedregions.RegionizedServerInitEvent");;
+
+    private boolean isClassExists(String clazz){
+        try{
+            Class.forName(clazz);
+            return true;
+        }catch(ClassNotFoundException e){
+            return false;
+        }
+    }
+
     @Override
     public void onEnable()
     {
@@ -625,6 +637,9 @@ public class TheosisEconomy extends JavaPlugin
     {
         return legacyComponentSerializer;
     }
+
+    // Getter for "isFolia"
+    public Boolean isFolia() { return isFolia; }
 
     // ----- Setters -----
 
