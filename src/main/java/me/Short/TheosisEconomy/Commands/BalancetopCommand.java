@@ -1,5 +1,6 @@
 package me.Short.TheosisEconomy.Commands;
 
+import me.Short.TheosisEconomy.Managers.BaltopManager;
 import me.Short.TheosisEconomy.TheosisEconomy;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -25,6 +26,9 @@ public class BalancetopCommand implements TabExecutor
     // Instance of "TheosisEconomy"
     private TheosisEconomy instance;
 
+    // Get BaltopManager
+    private BaltopManager baltopManager = TheosisEconomy.getBaltopManager();
+
     // Constructor
     public BalancetopCommand(TheosisEconomy instance)
     {
@@ -39,7 +43,7 @@ public class BalancetopCommand implements TabExecutor
 
         Economy economy = instance.getEconomy();
 
-        Map<String, BigDecimal> baltop = instance.getBaltop();
+        Map<String, BigDecimal> baltop = baltopManager.getBaltop();
 
         if (!baltop.isEmpty())
         {
@@ -79,7 +83,7 @@ public class BalancetopCommand implements TabExecutor
             Component output = miniMessage.deserialize(config.getString("messages.baltop.header"),
                             Placeholder.component("page", Component.text(specifiedPage)),
                             Placeholder.component("pages", Component.text(pages)),
-                            Placeholder.component("total", Component.text(economy.format(instance.getCombinedTotalBalance().doubleValue()))));
+                            Placeholder.component("total", Component.text(economy.format(baltopManager.getCombinedTotalBalance().doubleValue()))));
 
             int startPoint = (specifiedPage - 1) * pageLength;
 
@@ -130,12 +134,12 @@ public class BalancetopCommand implements TabExecutor
             {
 
                 ((Player) sender).spigot().sendMessage(instance.getBungeeComponentSerializer().serialize(miniMessage.deserialize(config.getString("messages.error.no-baltop-entries"),
-                                Placeholder.component("total", Component.text(economy.format(instance.getCombinedTotalBalance().doubleValue()))))));
+                                Placeholder.component("total", Component.text(economy.format(baltopManager.getCombinedTotalBalance().doubleValue()))))));
             }
             else
             {
                 sender.sendMessage(instance.getLegacyComponentSerializer().serialize(miniMessage.deserialize(config.getString("messages.error.no-baltop-entries"),
-                                Placeholder.component("total", Component.text(economy.format(instance.getCombinedTotalBalance().doubleValue()))))));
+                                Placeholder.component("total", Component.text(economy.format(baltopManager.getCombinedTotalBalance().doubleValue()))))));
             }
         }
 
@@ -148,7 +152,7 @@ public class BalancetopCommand implements TabExecutor
         List<String> suggestions = new ArrayList<>();
         if (args.length == 1)
         {
-            int pages = (int) Math.ceil((double) instance.getBaltop().size() / (double) instance.getConfig().getInt("settings.baltop.page-length"));
+            int pages = (int) Math.ceil((double) baltopManager.getBaltop().size() / (double) instance.getConfig().getInt("settings.baltop.page-length"));
             for (int i = 1; i < pages + 1; i++)
             {
                 String suggestion = Integer.toString(i);

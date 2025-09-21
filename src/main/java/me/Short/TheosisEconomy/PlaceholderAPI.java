@@ -1,5 +1,6 @@
 package me.Short.TheosisEconomy;
 
+import me.Short.TheosisEconomy.Managers.BaltopManager;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +20,9 @@ public class PlaceholderAPI extends PlaceholderExpansion
 
     // Instance of "TheosisEconomy"
     private TheosisEconomy instance;
+
+    // Get BaltopManager
+    private BaltopManager baltopManager = TheosisEconomy.getBaltopManager();
 
     // Constructor
     public PlaceholderAPI(TheosisEconomy instance)
@@ -62,13 +66,13 @@ public class PlaceholderAPI extends PlaceholderExpansion
         // %theosiseconomy_combined_total_balance%
         if (params.equalsIgnoreCase("combined_total_balance"))
         {
-            return instance.getCombinedTotalBalance().toPlainString();
+            return baltopManager.getCombinedTotalBalance().toPlainString();
         }
 
         // %theosiseconomy_combined_total_balance_formatted%
         if (params.equalsIgnoreCase("combined_total_balance_formatted"))
         {
-            return instance.getCombinedTotalBalance().toPlainString();
+            return baltopManager.getCombinedTotalBalance().toPlainString();
         }
 
         // %theosiseconomy_richest_<position>_name%
@@ -78,7 +82,7 @@ public class PlaceholderAPI extends PlaceholderExpansion
             {
                 int position = Integer.parseInt(StringUtils.replaceOnceIgnoreCase(StringUtils.replaceOnceIgnoreCase(params, "richest_", ""), "_name", ""));
 
-                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(instance.getBaltop().entrySet());
+                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(baltopManager.getBaltop().entrySet());
 
                 if (position <= baltopEntries.size())
                 {
@@ -100,7 +104,7 @@ public class PlaceholderAPI extends PlaceholderExpansion
             {
                 int position = Integer.parseInt(StringUtils.replaceOnceIgnoreCase(StringUtils.replaceOnceIgnoreCase(params, "richest_", ""), "_uuid", ""));
 
-                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(instance.getBaltop().entrySet());
+                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(baltopManager.getBaltop().entrySet());
 
                 if (position <= baltopEntries.size())
                 {
@@ -122,7 +126,7 @@ public class PlaceholderAPI extends PlaceholderExpansion
             {
                 int position = Integer.parseInt(StringUtils.replaceOnceIgnoreCase(StringUtils.replaceOnceIgnoreCase(params, "richest_", ""), "_balance", ""));
 
-                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(instance.getBaltop().entrySet());
+                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(baltopManager.getBaltop().entrySet());
 
                 if (position <= baltopEntries.size())
                 {
@@ -144,7 +148,7 @@ public class PlaceholderAPI extends PlaceholderExpansion
             {
                 int position = Integer.parseInt(StringUtils.replaceOnceIgnoreCase(StringUtils.replaceOnceIgnoreCase(params, "richest_", ""), "_balance_formatted", ""));
 
-                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(instance.getBaltop().entrySet());
+                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(baltopManager.getBaltop().entrySet());
 
                 if (position <= baltopEntries.size())
                 {
@@ -166,7 +170,7 @@ public class PlaceholderAPI extends PlaceholderExpansion
             {
                 int position = Integer.parseInt(StringUtils.replaceOnceIgnoreCase(StringUtils.replaceOnceIgnoreCase(params, "richest_", ""), "_entry", ""));
 
-                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(instance.getBaltop().entrySet());
+                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(baltopManager.getBaltop().entrySet());
 
                 if (position <= baltopEntries.size())
                 {
@@ -197,7 +201,7 @@ public class PlaceholderAPI extends PlaceholderExpansion
             {
                 int position = Integer.parseInt(StringUtils.replaceOnceIgnoreCase(StringUtils.replaceOnceIgnoreCase(params, "richest_", ""), "_entry_legacy", ""));
 
-                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(instance.getBaltop().entrySet());
+                List<Map.Entry<String, BigDecimal>> baltopEntries = new ArrayList<>(baltopManager.getBaltop().entrySet());
 
                 if (position <= baltopEntries.size())
                 {
