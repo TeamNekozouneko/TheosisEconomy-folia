@@ -6,8 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="62d8973a-1928-46a0-8037-db1de9bac114" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Commands/BalancetopCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Commands/BalancetopCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/PlaceholderAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/PlaceholderAPI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Commands/EconomyCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Commands/EconomyCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Commands/PaytoggleCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Commands/PaytoggleCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Economy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Economy.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,23 +30,23 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="3316BTv5aSTEqV9lv3g1QxfADBT" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "dev/folia",
-    "kotlin-language-version-configured": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev/folia&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <method v="2">
