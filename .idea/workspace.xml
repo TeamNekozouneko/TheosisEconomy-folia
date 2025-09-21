@@ -5,10 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="62d8973a-1928-46a0-8037-db1de9bac114" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Commands/EconomyCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Commands/EconomyCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Commands/PaytoggleCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Commands/PaytoggleCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Economy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/Economy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/TheosisEconomy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/Short/TheosisEconomy/TheosisEconomy.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
