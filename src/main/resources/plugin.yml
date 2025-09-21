@@ -4,6 +4,7 @@ version: '1.45'
 
 author: Short
 api-version: 1.13
+folia-supported: true
 
 load: STARTUP # This is needed because some plugins won't detect won't detect TheosisEconomy as an economy provider otherwise
 
