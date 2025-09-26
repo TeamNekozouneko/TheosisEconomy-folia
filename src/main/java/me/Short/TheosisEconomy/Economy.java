@@ -134,8 +134,14 @@ public class Economy implements net.milkbowl.vault.economy.Economy
         BigDecimal currentBalance = TheosisEconomy.getPlayerAccounts().get(uuid).getBalance();
         BigDecimal bdAmount = instance.round(BigDecimal.valueOf(amount)).stripTrailingZeros();
         double bdAmountDoubleValue = bdAmount.doubleValue();
+        int compareBalance = bdAmount.compareTo(BigDecimal.ZERO);
 
-        if (bdAmount.compareTo(BigDecimal.ZERO) > 0) // If the amount is greater than 0...
+        if (compareBalance == 0) // If the amount is 0, do nothing.
+        {
+            return new EconomyResponse(bdAmountDoubleValue, currentBalance.doubleValue(), ResponseType.SUCCESS, null);
+        }
+
+        if (compareBalance > 0) // If the amount is greater than 0...
         {
             if (bdAmount.scale() <= fractionalDigits()) // If the amount is within the decimal place scale of the configured amount...
             {
