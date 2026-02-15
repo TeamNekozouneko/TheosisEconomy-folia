@@ -224,7 +224,7 @@ public class Economy implements net.milkbowl.vault.economy.Economy
         UUID uuid = player.getUniqueId();
 
         BigDecimal currentBalance = TheosisEconomy.getPlayerAccounts().get(uuid).getBalance();
-        BigDecimal bdAmount = instance.round(BigDecimal.valueOf(amount)).stripTrailingZeros();
+        BigDecimal bdAmount = BigDecimal.valueOf(amount).stripTrailingZeros();
         double bdAmountDoubleValue = bdAmount.doubleValue();
 
         if (bdAmount.compareTo(BigDecimal.ZERO) > 0) // If the amount is greater than 0...
