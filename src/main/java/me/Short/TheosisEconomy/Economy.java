@@ -68,7 +68,7 @@ public class Economy implements net.milkbowl.vault.economy.Economy
         }
         else
         {
-            df = new DecimalFormat("#,##0");
+            df = new DecimalFormat("#,##0.00");
         }
 
         // Return formatted output, applying decimal format to the amount
@@ -132,7 +132,7 @@ public class Economy implements net.milkbowl.vault.economy.Economy
         UUID uuid = player.getUniqueId();
 
         BigDecimal currentBalance = TheosisEconomy.getPlayerAccounts().get(uuid).getBalance();
-        BigDecimal bdAmount = instance.round(BigDecimal.valueOf(amount)).stripTrailingZeros();
+        BigDecimal bdAmount = BigDecimal.valueOf(amount).stripTrailingZeros();
         double bdAmountDoubleValue = bdAmount.doubleValue();
         int compareBalance = bdAmount.compareTo(BigDecimal.ZERO);
 
